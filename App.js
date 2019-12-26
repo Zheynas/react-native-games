@@ -6,13 +6,9 @@ import Worm from './Worm';
 import Circle from './Circle';
 
 const {width, height} = Dimensions.get('screen');
-const BALL_SIZE = 25;
-const WORM_SIZE = 40;
+const BALL_SIZE = Math.trunc(Math.max(width, height) * 0.085) / 4;
+const WORM_SIZE = Math.trunc(Math.max(width, height) * 0.085) / 2;
 
-const startPoint = {
-  x: 100,
-  y: 100,
-};
 const wormStartPoint = {
   x: width / 2,
   y: height / 2,
@@ -21,6 +17,8 @@ const wormStartPoint = {
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+    this.startPoint = this._randomPoint();
+    console.log('hi', this.startPoint);
     // create our dude
     const worm = this._createWorm();
     this.wormBoi = worm;
@@ -32,6 +30,22 @@ export default class App extends React.Component {
     // keep track of our entities
     this.entities = this._getEntities(engine, world, worm, ball);
   }
+
+  _randomPoint = () => {
+    let random = Math.floor(Math.random() * 10);
+    let gridXPart = width / 15;
+    let gridYPart = height / 30;
+    let x = Math.floor(random * 15);
+    let y = Math.floor(random * 30);
+    return {
+      x: 10 + Math.floor(Math.random() * width - 20),
+      y: 30 + Math.floor(Math.random() * height - 50),
+    };
+  };
+
+  _resetBallPosition = () => {
+    Matter.Body.setPosition(this.firstBall, this._randomPoint());
+  };
 
   // physics for the engine
   _physics = (entities, {time}) => {
@@ -105,7 +119,14 @@ export default class App extends React.Component {
   };
 
   _createBall = () => {
-    const ball = Matter.Bodies.circle(startPoint.x, startPoint.y, BALL_SIZE);
+    const ball = Matter.Bodies.circle(
+      this.startPoint.x,
+      this.startPoint.y,
+      BALL_SIZE,
+      {
+        isStatic: true,
+      },
+    );
     return ball;
   };
 
@@ -116,7 +137,11 @@ export default class App extends React.Component {
         systems={[this._physics, this._moveWorm]}
         entities={this.entities}>
         <View style={styles.header}>
-          <Button onPress={this.reset} title="Reset" color="#841584" />
+          <Button
+            onPress={this._resetBallPosition}
+            title="Reset"
+            color="#841584"
+          />
         </View>
       </GameEngine>
     );

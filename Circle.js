@@ -16,7 +16,7 @@ export default class Circle extends Component {
           top: y,
           width: diameter,
           height: diameter,
-          borderRadius: 25,
+          borderRadius: diameter * 2,
           backgroundColor: this.props.bgColor,
           borderWidth: 3,
           borderColor: this.props.borderColor,
